@@ -20,16 +20,26 @@
             <el-descriptions-item label="文件类型">{{ task.fileTypes }}</el-descriptions-item>
           </el-descriptions>
           <p></p>
-          <el-input v-model="studentId" placeholder="填写学号" class="input-student-id narrow-input"></el-input>
-          <el-button type="primary" plain @click="submitStudentId" class="input-button">提交</el-button>
+          <div class="file-upload">
+            <h3>文件收集区域</h3>
+            <el-upload
+                class="upload-demo"
+                drag
+                :action="uploadUrl"
+                multiple
+                :before-upload="beforeUpload"
+                :on-success="handleUploadSuccess"
+                :on-error="handleUploadError"
+                :file-list="fileList"
+            >
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            </el-upload>
+            <el-input v-model="studentId" placeholder="填写学号" class="input-student-id narrow-input"></el-input>
+            <el-button type="primary" plain @click="submitStudentId" class="input-button">提交</el-button>
+          </div>
         </div>
       </el-header>
-      <el-footer>
-        <div class="footer-content">
-          © 2024 任务收集盒子. Powered by Lammy
-          <a href="/admin" class="admin-link">后台管理</a>
-        </div>
-      </el-footer>
     </el-container>
   </div>
 </template>
@@ -40,11 +50,11 @@ import {
   ElHeader,
   ElInput,
   ElButton,
-  ElFooter,
   ElLoading,
   ElSpinner,
   ElDescriptions,
-  ElDescriptionsItem
+  ElDescriptionsItem,
+  ElUpload
 } from 'element-plus';
 import axios from 'axios';
 
@@ -55,17 +65,19 @@ export default {
     ElHeader,
     ElInput,
     ElButton,
-    ElFooter,
     ElSpinner,
     ElDescriptions,
-    ElDescriptionsItem
+    ElDescriptionsItem,
+    ElUpload
   },
   data() {
     return {
       task: null,
       studentId: '',
       loading: false,
-      loadingInstance: null
+      loadingInstance: null,
+      fileList: [],
+      uploadUrl: 'https://jsonplaceholder.typicode.com/posts/' // Replace with your actual upload URL
     };
   },
   created() {
@@ -109,10 +121,24 @@ export default {
     },
     submitStudentId() {
       console.log('Student ID submitted:', this.studentId);
+    },
+    beforeUpload(file) {
+      const isValidFormat = file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      if (!isValidFormat) {
+        this.$message.error('文件格式必须是PDF或DOCX');
+      }
+      return isValidFormat;
+    },
+    handleUploadSuccess() {
+      this.$message.success('文件上传成功');
+    },
+    handleUploadError() {
+      this.$message.error('文件上传失败');
     }
   }
 }
 </script>
+
 
 <style scoped>
 @import "../style/main.css";

@@ -101,6 +101,7 @@ h1 {
     width: 100%; /* Full width on mobile */
     margin-left: 0; /* Remove left margin */
     margin-top: 10px; /* Add top margin */
+    margin-bottom: 20px;
   }
 
   .image-size {
