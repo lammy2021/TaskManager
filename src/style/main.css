@@ -1,0 +1,104 @@
+/* src/style/main.css */
+
+/* General styles */
+.narrow-input {
+  width: 300px; /* Adjust the width as needed */
+}
+
+.title-container {
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+}
+
+.title-container h1 {
+  font-size: 2.5em;
+}
+
+.title-container p {
+  font-size: 1em;
+  color: gray;
+}
+
+.title-container h1,
+.title-container h2,
+.title-container .el-input {
+  padding: 10px 0; /* Adjust the padding as needed */
+}
+
+.input-button {
+  padding: 15px; /* Adjust the padding as needed */
+  margin-left: 10px;
+}
+
+.image-size {
+  width: 80px; /* Set the desired width */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.user-prompt {
+  margin: 20px auto; /* Center horizontally and add top margin */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  width: 400px;
+}
+
+.footer-content {
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 15px;
+}
+
+.admin-link {
+  margin-left: 5px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.admin-link:hover {
+  text-decoration: underline;
+}
+/* Responsive styles */
+@media only screen and (max-width: 767px) {
+  .narrow-input {
+    width: 100%; /* Full width on mobile */
+  }
+
+  .input-button {
+    width: 100%; /* Full width on mobile */
+    margin-left: 0; /* Remove left margin */
+    margin-top: 10px; /* Add top margin */
+  }
+
+  .image-size {
+    width: 60px; /* Smaller logo on mobile */
+  }
+
+  .user-prompt {
+    width: 90%; /* Almost full width on mobile */
+  }
+
+  .title-container h1 {
+    font-size: 2em; /* Smaller font size on mobile */
+  }
+
+  .title-container p {
+    font-size: 0.9em; /* Smaller font size on mobile */
+  }
+
+  .footer-content {
+    font-size: 13px; /* Smaller font size on mobile */
+    width: 100%;
+  }
+}
