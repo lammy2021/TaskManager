@@ -21,6 +21,9 @@
         <li>
           <router-link to="/admin/user-management" active-class="active">用户管理</router-link>
         </li>
+        <li>
+          <router-link to="/admin/system-settings" active-class="active">系统设置</router-link>
+        </li>
         <!-- 退出登录选项 -->
         <li @click="confirmLogout" class="sidebar-logout">
           退出登录
