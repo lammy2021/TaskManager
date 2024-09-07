@@ -141,5 +141,5 @@ export default {
 
 
 <style scoped>
-@import "../style/main.css";
+@import "../styles/main.css";
 </style>
