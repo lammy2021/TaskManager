@@ -13,6 +13,7 @@ const routes = [
       { path: 'dashboard', component: ()=> import('../components/AdminDashboard.vue') },
       { path: 'add-collection', component: ()=> import('../components/AddCollection.vue') },
       { path: 'collection-management', component: ()=> import('../components/CollectionManagement.vue') },
+      { path: 'user-management', component: ()=> import('../components/UserManagement.vue') },
 
     ]
   }
