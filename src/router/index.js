@@ -10,7 +10,8 @@ const routes = [
     path: '/admin',
     component: ()=> import('../components/AdminDashboardPage.vue'), // Lazy load the component
     children: [
-      { path: 'dashboard', component: ()=> import('../components/AdminDashboard.vue') }
+      { path: 'dashboard', component: ()=> import('../components/AdminDashboard.vue') },
+      { path: 'add-collection', component: ()=> import('../components/AddCollection.vue') }
     ]
   }
 ]
