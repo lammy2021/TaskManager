@@ -70,8 +70,6 @@ h1 {
   text-decoration: underline;
 }
 
-
-
 .task-details {
   text-align: center;
   margin-top: 20px;
@@ -80,11 +78,6 @@ h1 {
 .loading-message {
   text-align: center;
   margin-top: 20px;
-}
-
-.wider-table {
-  width: 100%; /* Adjust the width as needed */
-  margin: 0 auto; /* Center the table */
 }
 
 .el-header {
@@ -93,14 +86,9 @@ h1 {
   align-items: center; /* Center content horizontally */
 }
 
-.task-details {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.loading-message {
-  text-align: center;
-  margin-top: 20px;
+.task-descriptions {
+  margin: 0 auto;
+  max-width: 900px; /* 控制最大宽度 */
 }
 
 /* Responsive styles */
@@ -134,5 +122,9 @@ h1 {
   .footer-content {
     font-size: 13px; /* Smaller font size on mobile */
     width: 100%;
+  }
+
+  .task-descriptions {
+    width: 90%;
   }
 }

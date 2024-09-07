@@ -12,32 +12,13 @@
           <p>加载任务信息中...</p>
         </div>
         <div class="task-details" v-else-if="task">
-          <el-table :data="[task]" class="wider-table">
-            <el-table-column label="任务信息">
-              <template #default="scope">
-                <el-row>
-                  <el-col :span="12">开始时间:</el-col>
-                  <el-col :span="12">{{ scope.row.startTime }}</el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="12">结束时间:</el-col>
-                  <el-col :span="12">{{ scope.row.endTime }}</el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="12">发布者:</el-col>
-                  <el-col :span="12">{{ scope.row.publisher }}</el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="12">简要:</el-col>
-                  <el-col :span="12">{{ scope.row.summary }}</el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="12">文件类型:</el-col>
-                  <el-col :span="12">{{ scope.row.fileTypes }}</el-col>
-                </el-row>
-              </template>
-            </el-table-column>
-          </el-table>
+          <el-descriptions class="task-descriptions" border title="任务详情">
+            <el-descriptions-item label="开始时间">{{ task.startTime }}</el-descriptions-item>
+            <el-descriptions-item label="结束时间">{{ task.endTime }}</el-descriptions-item>
+            <el-descriptions-item label="发布者">{{ task.publisher }}</el-descriptions-item>
+            <el-descriptions-item label="简要">{{ task.summary }}</el-descriptions-item>
+            <el-descriptions-item label="文件类型">{{ task.fileTypes }}</el-descriptions-item>
+          </el-descriptions>
           <p></p>
           <el-input v-model="studentId" placeholder="填写学号" class="input-student-id narrow-input"></el-input>
           <el-button type="primary" plain @click="submitStudentId" class="input-button">提交</el-button>
@@ -54,7 +35,17 @@
 </template>
 
 <script>
-import { ElContainer, ElHeader, ElInput, ElButton, ElFooter, ElLoading, ElSpinner, ElTable, ElTableColumn, ElRow, ElCol } from 'element-plus';
+import {
+  ElContainer,
+  ElHeader,
+  ElInput,
+  ElButton,
+  ElFooter,
+  ElLoading,
+  ElSpinner,
+  ElDescriptions,
+  ElDescriptionsItem
+} from 'element-plus';
 import axios from 'axios';
 
 export default {
@@ -66,10 +57,8 @@ export default {
     ElButton,
     ElFooter,
     ElSpinner,
-    ElTable,
-    ElTableColumn,
-    ElRow,
-    ElCol
+    ElDescriptions,
+    ElDescriptionsItem
   },
   data() {
     return {
@@ -93,11 +82,10 @@ export default {
         lock: true,
         text: '加载中...',
         background: 'rgba(0, 0, 0, 0.7)',
-        target: document.body // Add body modifier
+        target: document.body
       });
 
       if (taskId === '1') {
-        // Set test data for taskId 1
         this.task = {
           startTime: '2024-01-01 08:00',
           endTime: '2024-01-01 17:00',
@@ -120,7 +108,6 @@ export default {
       }
     },
     submitStudentId() {
-      // Handle student ID submission logic here
       console.log('Student ID submitted:', this.studentId);
     }
   }
@@ -129,5 +116,4 @@ export default {
 
 <style scoped>
 @import "../style/main.css";
-
 </style>
