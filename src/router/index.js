@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Main from '../components/Main.vue'
 import TaskPage from '../components/TaskPage.vue'
 import AdminDashboardPage from '../components/AdminDashboardPage.vue'
-import AdminDashboard from '../components/Dashboard.vue' // Import the new component
+import AdminDashboard from '../components/AdminDashboard.vue' // Import the renamed component
 
 const routes = [
   { path: '/', component: Main },
@@ -12,7 +12,7 @@ const routes = [
     path: '/admin',
     component: AdminDashboardPage,
     children: [
-      { path: 'dashboard', component: AdminDashboard } // Define the child route
+      { path: 'dashboard', component: AdminDashboard } // Use the renamed component
     ]
   }
 ]
