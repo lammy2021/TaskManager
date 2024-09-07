@@ -3,7 +3,7 @@
     <div class="header">
       <el-row type="flex" justify="start" align="middle">
         <el-col :span="24" class="header-title">
-          <h1>CollectWorkers</h1>
+          <h1>任务收集盒子</h1>
         </el-col>
       </el-row>
     </div>
