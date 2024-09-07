@@ -8,8 +8,22 @@
           <p>让任务收集便捷，快速，有序！</p>
         </div>
         <div v-if="loading" class="loading-message">
-          <el-spinner type="circle" size="large"></el-spinner>
           <p>加载任务信息中...</p>
+        </div>
+        <div v-else-if="error" class="error-message">
+          <div class="user-prompt">
+            <el-col>
+              <el-result
+                icon="error"
+                title="错误"
+                sub-title="加载任务失败，可能是任务ID输错或者是服务端崩溃"
+              >
+                <template #extra>
+                  <el-button type="primary" plain @click="goToHomePage">返回主页</el-button>
+                </template>
+              </el-result>
+            </el-col>
+          </div>
         </div>
         <div class="task-details" v-else-if="task">
           <el-descriptions class="task-descriptions" border title="任务详情">
@@ -51,11 +65,13 @@ import {
   ElInput,
   ElButton,
   ElLoading,
-  ElSpinner,
   ElDescriptions,
   ElDescriptionsItem,
-  ElUpload
+  ElUpload,
+  ElResult,
+  ElCol
 } from 'element-plus';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
@@ -65,10 +81,11 @@ export default {
     ElHeader,
     ElInput,
     ElButton,
-    ElSpinner,
     ElDescriptions,
     ElDescriptionsItem,
-    ElUpload
+    ElUpload,
+    ElResult,
+    ElCol
   },
   data() {
     return {
@@ -77,7 +94,17 @@ export default {
       loading: false,
       loadingInstance: null,
       fileList: [],
-      uploadUrl: 'https://jsonplaceholder.typicode.com/posts/' // Replace with your actual upload URL
+      uploadUrl: 'https://jsonplaceholder.typicode.com/posts/', // Replace with your actual upload URL
+      error: false
+    };
+  },
+  setup() {
+    const router = useRouter();
+    const goToHomePage = () => {
+      router.push('/');
+    };
+    return {
+      goToHomePage
     };
   },
   created() {
@@ -113,6 +140,7 @@ export default {
           this.task = response.data;
         } catch (error) {
           console.error('Error fetching task details:', error);
+          this.error = true;
         } finally {
           this.loadingInstance.close();
           this.loading = false;
@@ -138,7 +166,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
 @import "../styles/main.css";
