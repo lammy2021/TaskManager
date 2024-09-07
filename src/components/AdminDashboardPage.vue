@@ -10,13 +10,16 @@
     <div class="sidebar">
       <ul>
         <li>
-          <router-link to="/admin_dashboard/overview" active-class="active">总览</router-link>
+          <router-link to="/admin/dashboard" active-class="active">仪表盘</router-link>
         </li>
         <li>
-          <router-link to="/admin_dashboard/user-management" active-class="active">用户管理</router-link>
+          <router-link to="/admin/add-collection" active-class="active">添加收集</router-link>
         </li>
         <li>
-          <router-link to="/admin_dashboard/collection-management" active-class="active">收集管理</router-link>
+          <router-link to="/admin/collection-management" active-class="active">收集管理</router-link>
+        </li>
+        <li>
+          <router-link to="/admin/user-management" active-class="active">用户管理</router-link>
         </li>
         <!-- 退出登录选项 -->
         <li @click="confirmLogout" class="sidebar-logout">
