@@ -14,6 +14,7 @@ const routes = [
       { path: 'add-collection', component: ()=> import('../components/AddCollection.vue') },
       { path: 'collection-management', component: ()=> import('../components/CollectionManagement.vue') },
       { path: 'user-management', component: ()=> import('../components/UserManagement.vue') },
+      { path: 'system-settings', component: ()=> import('../components/SystemSettings.vue') },
 
     ]
   }
