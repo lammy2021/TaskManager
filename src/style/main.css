@@ -69,6 +69,40 @@ h1 {
 .admin-link:hover {
   text-decoration: underline;
 }
+
+
+
+.task-details {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-message {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.wider-table {
+  width: 100%; /* Adjust the width as needed */
+  margin: 0 auto; /* Center the table */
+}
+
+.el-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+}
+
+.task-details {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-message {
+  text-align: center;
+  margin-top: 20px;
+}
+
 /* Responsive styles */
 @media only screen and (max-width: 767px) {
   .narrow-input {
