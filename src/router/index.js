@@ -1,18 +1,16 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Main from '../components/Main.vue'
+import MainPage from '../components/MainPage.vue'
 import TaskPage from '../components/TaskPage.vue'
-import AdminDashboardPage from '../components/AdminDashboardPage.vue'
-import AdminDashboard from '../components/AdminDashboard.vue' // Import the renamed component
 
 const routes = [
-  { path: '/', component: Main },
+  { path: '/', component: MainPage },
   { path: '/task-page', component: TaskPage },
   {
     path: '/admin',
-    component: AdminDashboardPage,
+    component: ()=> import('../components/AdminDashboardPage.vue'), // Lazy load the component
     children: [
-      { path: 'dashboard', component: AdminDashboard } // Use the renamed component
+      { path: 'dashboard', component: ()=> import('../components/AdminDashboard.vue') }
     ]
   }
 ]
