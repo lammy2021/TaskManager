@@ -11,10 +11,9 @@
           <el-button type="primary" plain class="input-button" @click="goToTaskPage">进入收集页面</el-button>
         </div>
         <div class="user-prompt">
-          <p>如果任务发起者仅提供了任务编号</p>
+          <p>如果任务发起者提供了任务编号</p>
           <p>请填写任务编号并点击进入收集页面</p>
           <p>有问题请联系任务发布者处理</p>
-          <p>严禁将本服务用于违法用途，后果自负</p>
         </div>
       </el-header>
       <el-footer>
