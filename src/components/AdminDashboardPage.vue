@@ -37,17 +37,17 @@
 </template>
 
 <script setup>
-import { ElMessageBox, ElRow, ElCol } from 'element-plus'
-import { useStore } from 'vuex'
+import { ElMessageBox, ElRow, ElCol } from 'element-plus';
 import router from "@/router/index.js";
-
-const store = useStore()
+import Cookies from 'js-cookie';
+import axios from "axios";
 
 const logout = () => {
-  store.dispatch('logout')
-  router.push({ name: 'LoginAdmin' })
-  window.location.reload()
-}
+  Cookies.remove('jwt_token'); // Remove the JWT token from cookies
+  delete axios.defaults.headers.common['Authorization']; // Remove the token from axios headers
+  router.push({ path: '/login' }); // Redirect to the login page
+  window.location.reload(); // Reload the page
+};
 
 const confirmLogout = () => {
   ElMessageBox.confirm('你确定要退出登录吗？', '退出登录', {
@@ -55,11 +55,11 @@ const confirmLogout = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    logout()
+    logout();
   }).catch(() => {
-    // 用户取消了操作
-  })
-}
+    // User canceled the operation
+  });
+};
 </script>
 
 <style scoped>
