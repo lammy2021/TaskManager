@@ -15,7 +15,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="发布者">
-      <el-input v-model="form.publisher" disabled></el-input>
+      <el-input v-model="form.publisher.adminId" disabled></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" plain @click="submitForm">提交</el-button>
@@ -25,14 +25,17 @@
 
 <script setup>
 import { ref } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElButton, ElDatePicker, ElSelect, ElOption } from 'element-plus';
+import { ElForm, ElFormItem, ElInput, ElButton, ElDatePicker, ElSelect, ElOption, ElMessage } from 'element-plus';
+import axios from 'axios';
 
 const form = ref({
   startTime: '',
   endTime: '',
   summary: '',
   fileTypes: [],
-  publisher: '当前管理员用户名' // Replace with actual admin username
+  publisher: { adminId: 1 }, // Replace with actual admin ID
+  status: 'ACTIVE',
+  createdAt: new Date().toISOString()
 });
 
 const fileTypeOptions = [
@@ -40,9 +43,33 @@ const fileTypeOptions = [
   'jpg', 'jpeg', 'png', 'mp3', 'mp4', 'wmv', 'wma', 'flac', 'txt'
 ];
 
-const submitForm = () => {
-  console.log('Form submitted:', form.value);
-  // Add form submission logic here
+const submitForm = async () => {
+  try {
+    const payload = {
+      startTime: form.value.startTime,
+      endTime: form.value.endTime,
+      summary: form.value.summary,
+      fileFormat: form.value.fileTypes.join(','),
+      publisher: form.value.publisher,
+      status: form.value.status,
+      createdAt: form.value.createdAt
+    };
+
+    const response = await axios.post('/api/admin/task/add', payload, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 200) {
+      ElMessage.success('任务添加成功');
+    } else {
+      ElMessage.error('任务添加失败');
+    }
+  } catch (error) {
+    console.error('任务添加请求失败:', error);
+    ElMessage.error('任务添加请求失败，请检查网络或联系管理员');
+  }
 };
 </script>
 
