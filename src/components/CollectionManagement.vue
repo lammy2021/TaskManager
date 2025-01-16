@@ -24,12 +24,6 @@ const filteredCollections = computed(() =>
       data.summary.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 );
-
-const remind = (taskId) => {
-  console.log('Remind task:', taskId);
-  // Add remind logic here
-};
-
 const exportData = (taskId) => {
   console.log('Export data for task:', taskId);
   // Add export logic here
@@ -61,7 +55,6 @@ const viewDetails = (taskId) => {
         <el-input v-model="searchQuery" size="small" placeholder="Type to search"></el-input>
       </template>
       <template #default="scope">
-        <el-button type="primary" size="small" @click="remind(scope.row.taskId)">催收</el-button>
         <el-button type="success" size="small" @click="exportData(scope.row.taskId)">导出</el-button>
         <el-button type="danger" size="small" @click="stopCollection(scope.row.taskId)">停收</el-button>
         <el-button size="small" @click="viewDetails(scope.row.taskId)">查看</el-button>

@@ -16,7 +16,7 @@
               <el-result
                 icon="error"
                 title="错误"
-                sub-title="加载任务失败，可能是任务ID输错或者是服务端崩溃"
+                sub-title="加载任务失败，可能是任务ID输错或者服务端崩溃"
               >
                 <template #extra>
                   <el-button type="primary" plain @click="goToHomePage">返回主页</el-button>
@@ -27,14 +27,24 @@
         </div>
         <div class="task-details" v-else-if="task">
           <el-descriptions class="task-descriptions" border title="任务详情">
-            <el-descriptions-item label="开始时间">{{ task.startTime }}</el-descriptions-item>
-            <el-descriptions-item label="结束时间">{{ task.endTime }}</el-descriptions-item>
-            <el-descriptions-item label="发布者">{{ task.publisher }}</el-descriptions-item>
+            <el-descriptions-item label="开始时间">{{ formatTime(task.startTime) }}</el-descriptions-item>
+            <el-descriptions-item label="结束时间">{{ formatTime(task.endTime) }}</el-descriptions-item>
+            <el-descriptions-item label="发布者">{{ task.publisher.username }}</el-descriptions-item>
             <el-descriptions-item label="简要">{{ task.summary }}</el-descriptions-item>
-            <el-descriptions-item label="文件类型">{{ task.fileTypes }}</el-descriptions-item>
+            <el-descriptions-item label="文件类型">
+              <el-tag
+                v-for="fileType in task.fileFormat.split(',')"
+                :key="fileType"
+                type="primary"
+                effect="plain"
+                class="file-type-tag"
+              >
+                {{ fileType }}
+              </el-tag>
+            </el-descriptions-item>
           </el-descriptions>
           <p></p>
-          <div class="file-upload">
+          <div v-if="task.status !== 'STOPPED' && !isTaskEnded" class="file-upload">
             <h3>文件收集区域</h3>
             <el-upload
                 class="upload-demo"
@@ -44,13 +54,26 @@
                 :before-upload="beforeUpload"
                 :on-success="handleUploadSuccess"
                 :on-error="handleUploadError"
+                :on-change="handleFileChange"
                 :file-list="fileList"
+                :data="uploadData"
+                :auto-upload="false"
+                ref="upload"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             </el-upload>
             <el-input v-model="studentId" placeholder="填写学号" class="input-student-id narrow-input"></el-input>
             <el-button type="primary" plain @click="submitStudentId" class="input-button">提交</el-button>
+          </div>
+          <div v-else class="collection-stopped">
+            <el-alert
+              title="收集已停止"
+              type="error"
+              show-icon
+              center
+              :closable="false"
+            />
           </div>
         </div>
       </el-header>
@@ -69,13 +92,15 @@ import {
   ElDescriptionsItem,
   ElUpload,
   ElResult,
-  ElCol
+  ElCol,
+  ElAlert,
+  ElTag
 } from 'element-plus';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
-  name: 'MainPage',
+  name: 'TaskPage',
   components: {
     ElContainer,
     ElHeader,
@@ -85,7 +110,9 @@ export default {
     ElDescriptionsItem,
     ElUpload,
     ElResult,
-    ElCol
+    ElCol,
+    ElAlert,
+    ElTag
   },
   data() {
     return {
@@ -94,7 +121,6 @@ export default {
       loading: false,
       loadingInstance: null,
       fileList: [],
-      uploadUrl: 'https://jsonplaceholder.typicode.com/posts/', // Replace with your actual upload URL
       error: false
     };
   },
@@ -124,36 +150,67 @@ export default {
         target: document.body
       });
 
-      if (taskId === '1') {
-        this.task = {
-          startTime: '2024-01-01 08:00',
-          endTime: '2024-01-01 17:00',
-          publisher: '测试发布者',
-          summary: '这是一个测试任务，测试任务需要收集一下你们的数学作业，请提交docx或者pdf文件，请按照要求的格式上传文件，否则拒收。',
-          fileTypes: 'PDF, DOCX'
-        };
+      try {
+        const response = await axios.get(`/api/task/info`, { params: { taskid: taskId } });
+        if (response.data.status === 'success') {
+          this.task = response.data.task;
+        } else {
+          this.error = true;
+        }
+      } catch (error) {
+        console.error('Error fetching task details:', error);
+        this.error = true;
+      } finally {
         this.loadingInstance.close();
         this.loading = false;
-      } else {
-        try {
-          const response = await axios.get(`/api/tasks/${taskId}`);
-          this.task = response.data;
-        } catch (error) {
-          console.error('Error fetching task details:', error);
-          this.error = true;
-        } finally {
-          this.loadingInstance.close();
-          this.loading = false;
-        }
       }
     },
-    submitStudentId() {
-      console.log('Student ID submitted:', this.studentId);
+    formatTime(time) {
+      return time.replace('T', ' ');
+    },
+    handleFileChange(file, fileList) {
+      this.fileList = fileList;
+    },
+    async submitStudentId() {
+
+      let taskId = this.$route.query.taskid;
+      this.task.id=taskId;
+
+      console.log('Student ID:', this.studentId);
+      console.log('File List:', this.fileList);
+      console.log('Task ID:', this.task ? this.task.id : 'No task');
+
+      if (this.studentId && this.fileList.length > 0 && this.task) {
+        const formData = new FormData();
+        formData.append('file', this.fileList[0].raw);
+        formData.append('taskId', this.task.id);
+        formData.append('studentNumber', this.studentId);
+
+        try {
+          const response = await axios.post('/api/task/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          if (response.data.status === 'success') {
+            this.$message.success('File uploaded successfully');
+          } else {
+            this.$message.error('File upload failed');
+          }
+        } catch (error) {
+          console.error('Error uploading file:', error);
+          this.$message.error('File upload failed');
+        }
+      } else {
+        this.$message.error('Please fill in the student number and select a file');
+      }
     },
     beforeUpload(file) {
-      const isValidFormat = file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const allowedFileTypes = this.task.fileFormat.split(',').map(type => type.trim().toLowerCase());
+      const fileType = file.name.split('.').pop().toLowerCase();
+      const isValidFormat = allowedFileTypes.includes(fileType);
       if (!isValidFormat) {
-        this.$message.error('文件格式必须是PDF或DOCX');
+        this.$message.error(`文件格式必须是: ${allowedFileTypes.join(', ')}`);
       }
       return isValidFormat;
     },
@@ -163,10 +220,20 @@ export default {
     handleUploadError() {
       this.$message.error('文件上传失败');
     }
+  },
+  computed: {
+    isTaskEnded() {
+      return new Date() > new Date(this.task.endTime);
+    }
   }
 }
 </script>
 
 <style scoped>
 @import "../styles/main.css";
+
+.file-type-tag {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
 </style>
