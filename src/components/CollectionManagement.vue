@@ -54,9 +54,23 @@ const handleCurrentChange = (newPage) => {
   currentPage.value = newPage;
 };
 
-const exportData = (taskId) => {
-  console.log('Export data for task:', taskId);
-  // Add export logic here
+const exportData = async (taskId) => {
+  try {
+    const response = await axios.get(`/api/admin/task/export?taskid=${taskId}`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('jwt_token')}`
+      }
+    });
+    if (response.data.status === 'success') {
+      const downloadLink = `/api${response.data.downloadLink}`;
+      window.location.href = downloadLink;
+    } else {
+      ElMessage.error('Failed to export data');
+    }
+  } catch (error) {
+    console.error('Failed to export data:', error);
+    ElMessage.error('Failed to export data, please check your network or contact the administrator');
+  }
 };
 
 const stopCollection = (taskId) => {
@@ -76,7 +90,7 @@ const viewDetails = (taskId) => {
     <el-table-column prop="taskId" label="任务ID" width="80"></el-table-column>
     <el-table-column prop="startTime" label="开始时间" width="150"></el-table-column>
     <el-table-column prop="endTime" label="结束时间" width="150"></el-table-column>
-    <el-table-column prop="summary" label="简要" width="220"></el-table-column>
+    <el-table-column prop="summary" label="���要" width="220"></el-table-column>
     <el-table-column label="文件类型" width="150">
       <template #default="scope">
         <el-tag v-for="fileType in scope.row.fileFormat" :key="fileType" type="primary" style="margin-right: 4px;">
