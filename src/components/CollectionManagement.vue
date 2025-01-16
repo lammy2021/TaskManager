@@ -73,9 +73,23 @@ const exportData = async (taskId) => {
   }
 };
 
-const stopCollection = (taskId) => {
-  console.log('Stop collection for task:', taskId);
-  // Add stop collection logic here
+const stopCollection = async (taskId) => {
+  try {
+    const response = await axios.post('/api/admin/task/stopcollect', { taskId }, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('jwt_token')}`
+      }
+    });
+    if (response.data.status === 'success') {
+      ElMessage.success('Collection stopped successfully');
+      fetchTaskList(); // Refresh the task list
+    } else {
+      ElMessage.error('Failed to stop collection');
+    }
+  } catch (error) {
+    console.error('Failed to stop collection:', error);
+    ElMessage.error('Failed to stop collection, please check your network or contact the administrator');
+  }
 };
 
 const viewDetails = (taskId) => {
@@ -90,7 +104,7 @@ const viewDetails = (taskId) => {
     <el-table-column prop="taskId" label="任务ID" width="80"></el-table-column>
     <el-table-column prop="startTime" label="开始时间" width="150"></el-table-column>
     <el-table-column prop="endTime" label="结束时间" width="150"></el-table-column>
-    <el-table-column prop="summary" label="���要" width="220"></el-table-column>
+    <el-table-column prop="summary" label="简要" width="220"></el-table-column>
     <el-table-column label="文件类型" width="150">
       <template #default="scope">
         <el-tag v-for="fileType in scope.row.fileFormat" :key="fileType" type="primary" style="margin-right: 4px;">
@@ -109,9 +123,9 @@ const viewDetails = (taskId) => {
     <el-table-column prop="publisher.username" label="发布者" width="100"></el-table-column>
     <el-table-column align="right" label="操作" width="200" fixed="right">
       <template #default="scope">
-        <el-button type="success" size="small" @click="exportData(scope.row.taskId)">导出</el-button>
-        <el-button type="danger" size="small" @click="stopCollection(scope.row.taskId)">停收</el-button>
-        <el-button size="small" @click="viewDetails(scope.row.taskId)">查看</el-button>
+        <el-button type="success" plain size="small" @click="exportData(scope.row.taskId)">导出</el-button>
+        <el-button type="danger" plain size="small" @click="stopCollection(scope.row.taskId)">停收</el-button>
+        <el-button size="small" plain @click="viewDetails(scope.row.taskId)">查看</el-button>
       </template>
     </el-table-column>
   </el-table>
