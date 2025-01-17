@@ -4,7 +4,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     historyApiFallback: true,
-    open: true,
+    // open: true,
     proxy: {
       '/api': {
         target: 'http://localhost:6776',
