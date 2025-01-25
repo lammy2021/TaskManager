@@ -18,7 +18,7 @@
       </el-header>
       <el-footer>
         <div class="footer-content">
-          © 2024 任务收集盒子. Powered by Lammy
+          © 2025 任务收集盒子. Powered by Lammy
           <a href="/admin/dashboard" class="admin-link">后台管理</a>
         </div>
       </el-footer>
