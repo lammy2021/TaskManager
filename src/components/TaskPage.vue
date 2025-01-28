@@ -94,7 +94,7 @@ import {
   ElResult,
   ElCol,
   ElAlert,
-  ElTag
+  ElTag, ElMessage
 } from 'element-plus';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
@@ -172,9 +172,8 @@ export default {
       this.fileList = fileList;
     },
     async submitStudentId() {
-
       let taskId = this.$route.query.taskid;
-      this.task.id=taskId;
+      this.task.id = taskId;
 
       console.log('Student ID:', this.studentId);
       console.log('File List:', this.fileList);
@@ -193,16 +192,27 @@ export default {
             }
           });
           if (response.data.status === 'success') {
-            this.$message.success('File uploaded successfully');
+            ElMessage.success('File uploaded successfully');
           } else {
-            this.$message.error('File upload failed');
+            ElMessage.error('File upload failed');
           }
         } catch (error) {
           console.error('Error uploading file:', error);
-          this.$message.error('File upload failed');
+          if (error.response && error.response.data && error.response.data.error) {
+            const errorMessage = error.response.data.error;
+            if (errorMessage === '学号不正确') {
+              ElMessage.error('学号不正确');
+            } else if (errorMessage === '已存在相同文件名称') {
+              ElMessage.error('已存在相同文件名称');
+            } else {
+              ElMessage.error('系统异常，请联系管理员处理');
+            }
+          } else {
+            ElMessage.error('系统异常，请联系管理员处理');
+          }
         }
       } else {
-        this.$message.error('Please fill in the student number and select a file');
+        ElMessage.error('Please fill in the student number and select a file');
       }
     },
     beforeUpload(file) {
