@@ -47,7 +47,7 @@ const addUser = async () => {
     });
     if (response.data.status === 'success') {
       ElMessage.success('User added successfully');
-      fetchUsers(); // Refresh the user list
+      await fetchUsers(); // Refresh the user list
       newUser.value = { studentNumber: '', name: '' }; // Clear input fields
     } else {
       ElMessage.error('Failed to add user');
