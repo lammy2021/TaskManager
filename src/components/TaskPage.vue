@@ -192,9 +192,9 @@ export default {
             }
           });
           if (response.data.status === 'success') {
-            ElMessage.success('File uploaded successfully');
+            ElMessage.success('文件上传成功');
           } else {
-            ElMessage.error('File upload failed');
+            ElMessage.error('文件上传失败');
           }
         } catch (error) {
           console.error('Error uploading file:', error);
@@ -212,7 +212,7 @@ export default {
           }
         }
       } else {
-        ElMessage.error('Please fill in the student number and select a file');
+        ElMessage.error('请输入学号并且选择要上传的文件');
       }
     },
     beforeUpload(file) {
