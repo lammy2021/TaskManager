@@ -41,7 +41,7 @@
           <el-icon><Setting /></el-icon>
           <span>系统设置</span>
         </el-menu-item>
-        <el-menu-item index="logout" @click="confirmLogout">
+        <el-menu-item @click="confirmLogout" :index="null">
           <el-icon><SwitchButton /></el-icon>
           <span>退出登录</span>
         </el-menu-item>
@@ -93,7 +93,7 @@ const toggleCollapse = () => {
 };
 
 const handleSelect = (key) => {
-  if (key !== 'logout') {
+  if (key && key !== '') {
     activeIndex.value = key;
   }
 };
@@ -113,7 +113,7 @@ const confirmLogout = () => {
   }).then(() => {
     logout();
   }).catch(() => {
-    // User canceled the operation
+    // 取消操作，不做任何处理
   });
 };
 </script>
