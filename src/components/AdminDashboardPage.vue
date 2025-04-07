@@ -3,7 +3,10 @@
     <!-- 侧边栏 -->
     <div class="sidebar" :class="{ 'is-collapsed': isCollapsed }">
       <div class="logo-container">
-        <h3 class="app-title" v-if="!isCollapsed">任务收集盒子</h3>
+        <div class="logo-content" v-if="!isCollapsed">
+          <img src="../images/cloud.png" alt="Logo" class="logo-img" />
+          <h3 class="app-title">任务收集盒子</h3>
+        </div>
         <img src="../images/cloud.png" alt="Logo" class="app-icon" v-else />
       </div>
       

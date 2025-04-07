@@ -52,11 +52,24 @@ body {
     padding: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* 确保内容居中 */
     background-color: #f5f7fa;
     color: #303133;
     overflow: hidden;
     border-bottom: 1px solid #e4e7ed;
+}
+
+.logo-content {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 整体居中显示 */
+}
+
+.logo-img {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    object-fit: contain;
 }
 
 .app-title {
