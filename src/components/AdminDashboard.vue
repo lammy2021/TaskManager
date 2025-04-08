@@ -58,37 +58,13 @@
           <div class="chart" ref="fileTypeChart"></div>
         </el-card>
       </div>
-
-      <div class="recent-tasks">
-        <el-card class="full-width">
-          <template #header>
-            <div class="card-header">
-              <span>最近任务</span>
-            </div>
-          </template>
-          <el-table :data="recentTasks" style="width: 100%">
-            <el-table-column prop="taskId" label="任务ID" width="80"></el-table-column>
-            <el-table-column prop="summary" label="简要" width="200"></el-table-column>
-            <el-table-column prop="startTime" label="开始时间" width="150"></el-table-column>
-            <el-table-column prop="endTime" label="结束时间" width="150"></el-table-column>
-            <el-table-column label="状态" width="100">
-              <template #default="scope">
-                <el-tag :type="scope.row.status === 'STOPPED' ? 'danger' : 'success'">
-                  {{ scope.row.status === 'STOPPED' ? '已停止' : '收集中' }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="publisher.username" label="发布者" width="100"></el-table-column>
-          </el-table>
-        </el-card>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { ElCard, ElTable, ElTableColumn, ElTag, ElLoading } from 'element-plus';
+import { ElCard, ElLoading } from 'element-plus';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import * as echarts from 'echarts';
@@ -137,17 +113,6 @@ const taskStats = computed(() => {
     stopped: tasks.value.filter(task => task.status === 'STOPPED').length,
     todayCreated: tasks.value.filter(task => dayjs(task.createdAt).format('YYYY-MM-DD') === today).length
   };
-});
-
-const recentTasks = computed(() => {
-  return [...tasks.value]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5)
-    .map(task => ({
-      ...task,
-      startTime: task.startTime.replace('T', ' '),
-      endTime: task.endTime.replace('T', ' ')
-    }));
 });
 
 const renderCharts = () => {
@@ -296,14 +261,6 @@ const renderFileTypeChart = () => {
 
 .card-header {
   font-weight: bold;
-}
-
-.recent-tasks {
-  margin: 20px 0;
-}
-
-.full-width {
-  width: 100%;
 }
 
 .loading-container {
