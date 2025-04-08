@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { ElTable, ElTableColumn, ElButton, ElInput, ElMessage } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElInput, ElMessage, ElLoading } from 'element-plus';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -8,8 +8,14 @@ const searchQuery = ref('');
 const users = ref([]);
 const newUser = ref({ studentNumber: '', name: '' });
 
+let loadingInstance = null; // 用于存储加载实例
+
 const fetchUsers = async () => {
   try {
+    loadingInstance = ElLoading.service({
+      target: '.el-table', // 指定表格作为加载的目标
+      text: '加载中...',
+    });
     const response = await axios.get('/api/admin/user/list', {
       headers: {
         'Authorization': `Bearer ${Cookies.get('jwt_token')}`
@@ -23,6 +29,10 @@ const fetchUsers = async () => {
   } catch (error) {
     console.error('Failed to fetch user list:', error);
     ElMessage.error('Failed to fetch user list, please check your network or contact the administrator');
+  } finally {
+    if (loadingInstance) {
+      loadingInstance.close(); // 关闭加载指示器
+    }
   }
 };
 

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { ElTable, ElTableColumn, ElInput, ElButton, ElMessage, ElPagination, ElTag } from 'element-plus';
+import { ElTable, ElTableColumn, ElInput, ElButton, ElMessage, ElPagination, ElTag, ElLoading } from 'element-plus';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import dayjs from 'dayjs';
@@ -11,8 +11,14 @@ const currentPage = ref(1);
 const pageSize = ref(8);
 const totalItems = ref(0);
 
+let loadingInstance = null; // 用于存储加载实例
+
 const fetchTaskList = async () => {
   try {
+    loadingInstance = ElLoading.service({
+      target: '.el-table', // 指定表格作为加载的目标
+      text: '加载中...',
+    });
     const response = await axios.get('/api/admin/task/list', {
       headers: {
         'Authorization': `Bearer ${Cookies.get('jwt_token')}`
@@ -23,6 +29,10 @@ const fetchTaskList = async () => {
   } catch (error) {
     console.error('Failed to fetch task list:', error);
     ElMessage.error('Failed to fetch task list, please check your network or contact the administrator');
+  } finally {
+    if (loadingInstance) {
+      loadingInstance.close(); // 关闭加载指示器
+    }
   }
 };
 
