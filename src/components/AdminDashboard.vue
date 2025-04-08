@@ -1,48 +1,315 @@
 <template>
   <div>
-    <div class="card-container">
-      <el-card class="card" v-for="(notice, index) in notices" :key="index" :class="{'full-width': notice.title === '将要实现的功能'}">
-        <template v-slot:header>
-          <div class="card-header">
-            <span>{{ notice.title }}</span>
-          </div>
-        </template>
-        <div>{{ notice.content }}</div>
-      </el-card>
+    <div v-if="loading" class="loading-container">
+      <el-loading :fullscreen="true" text="加载数据中..." />
+    </div>
+    <div v-else>
+      <div class="dashboard-stats">
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>任务总数</span>
+            </div>
+          </template>
+          <div class="stat-value">{{ taskStats.total }}</div>
+        </el-card>
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>收集中任务</span>
+            </div>
+          </template>
+          <div class="stat-value">{{ taskStats.active }}</div>
+        </el-card>
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>已结束任务</span>
+            </div>
+          </template>
+          <div class="stat-value">{{ taskStats.stopped }}</div>
+        </el-card>
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>今日创建任务</span>
+            </div>
+          </template>
+          <div class="stat-value">{{ taskStats.todayCreated }}</div>
+        </el-card>
+      </div>
+
+      <div class="chart-container">
+        <el-card class="chart-card">
+          <template #header>
+            <div class="card-header">
+              <span>任务状态分布</span>
+            </div>
+          </template>
+          <div class="chart" ref="statusChart"></div>
+        </el-card>
+
+        <el-card class="chart-card">
+          <template #header>
+            <div class="card-header">
+              <span>文件类型分布</span>
+            </div>
+          </template>
+          <div class="chart" ref="fileTypeChart"></div>
+        </el-card>
+      </div>
+
+      <div class="recent-tasks">
+        <el-card class="full-width">
+          <template #header>
+            <div class="card-header">
+              <span>最近任务</span>
+            </div>
+          </template>
+          <el-table :data="recentTasks" style="width: 100%">
+            <el-table-column prop="taskId" label="任务ID" width="80"></el-table-column>
+            <el-table-column prop="summary" label="简要" width="200"></el-table-column>
+            <el-table-column prop="startTime" label="开始时间" width="150"></el-table-column>
+            <el-table-column prop="endTime" label="结束时间" width="150"></el-table-column>
+            <el-table-column label="状态" width="100">
+              <template #default="scope">
+                <el-tag :type="scope.row.status === 'STOPPED' ? 'danger' : 'success'">
+                  {{ scope.row.status === 'STOPPED' ? '已停止' : '收集中' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="publisher.username" label="发布者" width="100"></el-table-column>
+          </el-table>
+        </el-card>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue';
+import { ElCard, ElTable, ElTableColumn, ElTag, ElLoading } from 'element-plus';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import * as echarts from 'echarts';
+import dayjs from 'dayjs';
 
-const notices = ref([
-  { title: '注意事项', content: '请妥善保管你的用户名和密码，如有丢失，请立即找回密码' },
-  { title: '添加收集', content: '点击左侧的添加收集，然后填入必要的信息，然后点提交即可。' },
-  { title: '收集管理', content: '你可以在收集管理页面进行对已经发布了的收集进行管理的操作，不是发布的收集你没有操作的权限。点击导出将会打包目前收集到的所有附件为压缩文件导出。' },
-  { title: '用户管理和系统管理', content: '在用户管理你可以对已经导入了的账户进行操作，在系统管理可以对系统的基础配置进行修改，如果你不是超级管理员将无法查看到这个选项卡。' },
-  { title: '将要实现的功能', content: '管理员后台适配移动端响应⭐⭐⭐' }
+const tasks = ref([]);
+const loading = ref(false);
+const statusChart = ref(null);
+const fileTypeChart = ref(null);
+let loadingInstance = null;
 
-])
+const fetchTaskList = async () => {
+  loading.value = true;
+  loadingInstance = ElLoading.service({
+    target: 'body',
+    text: '加载中...',
+  });
+  
+  try {
+    const response = await axios.get('/api/admin/task/list', {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('jwt_token')}`
+      }
+    });
+    tasks.value = response.data;
+    renderCharts();
+  } catch (error) {
+    console.error('Failed to fetch task list:', error);
+  } finally {
+    loading.value = false;
+    if (loadingInstance) {
+      loadingInstance.close();
+    }
+  }
+};
+
+onMounted(() => {
+  fetchTaskList();
+});
+
+const taskStats = computed(() => {
+  const today = dayjs().format('YYYY-MM-DD');
+  return {
+    total: tasks.value.length,
+    active: tasks.value.filter(task => task.status !== 'STOPPED').length,
+    stopped: tasks.value.filter(task => task.status === 'STOPPED').length,
+    todayCreated: tasks.value.filter(task => dayjs(task.createdAt).format('YYYY-MM-DD') === today).length
+  };
+});
+
+const recentTasks = computed(() => {
+  return [...tasks.value]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5)
+    .map(task => ({
+      ...task,
+      startTime: task.startTime.replace('T', ' '),
+      endTime: task.endTime.replace('T', ' ')
+    }));
+});
+
+const renderCharts = () => {
+  setTimeout(() => {
+    renderStatusChart();
+    renderFileTypeChart();
+  }, 0);
+};
+
+const renderStatusChart = () => {
+  if (!statusChart.value) return;
+
+  const activeCount = tasks.value.filter(task => task.status !== 'STOPPED').length;
+  const stoppedCount = tasks.value.filter(task => task.status === 'STOPPED').length;
+
+  const chart = echarts.init(statusChart.value);
+  const option = {
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 10,
+      data: ['收集中', '已停止']
+    },
+    series: [
+      {
+        name: '任务状态',
+        type: 'pie',
+        radius: ['50%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          { value: activeCount, name: '收集中' },
+          { value: stoppedCount, name: '已停止' }
+        ]
+      }
+    ]
+  };
+  chart.setOption(option);
+  window.addEventListener('resize', () => {
+    chart.resize();
+  });
+};
+
+const renderFileTypeChart = () => {
+  if (!fileTypeChart.value) return;
+
+  // 统计所有文件类型
+  const fileTypesMap = {};
+  tasks.value.forEach(task => {
+    const fileTypes = task.fileFormat.split(',');
+    fileTypes.forEach(type => {
+      const cleanType = type.trim();
+      fileTypesMap[cleanType] = (fileTypesMap[cleanType] || 0) + 1;
+    });
+  });
+
+  const fileTypeData = Object.entries(fileTypesMap).map(([name, value]) => ({ name, value }));
+
+  const chart = echarts.init(fileTypeChart.value);
+  const option = {
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 10,
+      data: fileTypeData.map(item => item.name)
+    },
+    series: [
+      {
+        name: '文件类型',
+        type: 'pie',
+        radius: '50%',
+        data: fileTypeData,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  };
+  chart.setOption(option);
+  window.addEventListener('resize', () => {
+    chart.resize();
+  });
+};
 </script>
 
 <style scoped>
-.card-container {
+.dashboard-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
-.card {
-  min-width: 200px;
+.stat-card {
+  text-align: center;
 }
 
-.full-width {
-  grid-column: span 4;
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #409EFF;
+}
+
+.chart-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.chart-card {
+  height: 400px;
+}
+
+.chart {
+  height: 350px;
 }
 
 .card-header {
   font-weight: bold;
+}
+
+.recent-tasks {
+  margin: 20px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
 }
 </style>
